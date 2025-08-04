@@ -7,7 +7,7 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-// Import routes
+
 const productsRoutes = require('./routes/products');
 const authRoutes = require('./routes/auth');
 const ordersRoutes = require('./routes/orders');
