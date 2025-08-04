@@ -1,7 +1,13 @@
-/* .gitignore */
+# Ignore environment variables
 .env
+
+# Node modules
 node_modules/
-dist/
-build/
+
+# Build output
+/dist/
+/build/
+
+# System files
 .DS_Store
 npm-debug.log*
