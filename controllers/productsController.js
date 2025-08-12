@@ -4,10 +4,13 @@ const cloudinary = require('../config/cloudinary');
 // Helper to upload image to Cloudinary using a Promise
 function uploadToCloudinary(buffer) {
   return new Promise((resolve, reject) => {
-    const stream = cloudinary.uploader.upload_stream({ resource_type: 'image' }, (error, result) => {
-      if (error) return reject(error);
-      resolve(result);
-    });
+    const stream = cloudinary.uploader.upload_stream(
+      { resource_type: 'image' }, 
+      (error, result) => {
+        if (error) return reject(error);
+        resolve(result);
+      }
+    );
     stream.end(buffer);
   });
 }

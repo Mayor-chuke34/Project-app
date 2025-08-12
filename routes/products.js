@@ -2,8 +2,8 @@ const express = require('express');
 const router = express.Router();
 const productsController = require('../controllers/productsController');
 const upload = require('../middleware/upload');
-const authMiddleware = require('../middleware/authMiddleware');
-const adminMiddleware = require('../middleware/adminMiddleware');
+const authMiddleware = require('../middleware/auth');
+const adminMiddleware = require('../middleware/admin');
 
 // GET /api/products
 router.get('/', productsController.getAllProducts);
