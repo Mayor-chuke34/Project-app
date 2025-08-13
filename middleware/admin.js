@@ -1,13 +1,30 @@
-const User = require('../models/User');
-
-module.exports = async (req, res, next) => {
+// middleware/admin.js - Create this new file
+const adminMiddleware = (req, res, next) => {
   try {
-    const user = await User.findById(req.userId);
-    if (!user || !user.isAdmin) {
-      return res.status(403).json({ error: 'Access denied. Admins only.' });
+    // Check if user exists and is admin
+    if (!req.user) {
+      return res.status(401).json({ 
+        success: false,
+        message: 'Authentication required' 
+      });
     }
+
+    if (!req.user.isAdmin) {
+      return res.status(403).json({ 
+        success: false,
+        message: 'Admin access required' 
+      });
+    }
+
     next();
-  } catch (err) {
-    res.status(500).json({ error: 'Server error', details: err.message });
+  } catch (error) {
+    console.error('Admin middleware error:', error);
+    res.status(500).json({ 
+      success: false,
+      message: 'Server error in admin check',
+      error: error.message 
+    });
   }
 };
+
+module.exports = adminMiddleware;
