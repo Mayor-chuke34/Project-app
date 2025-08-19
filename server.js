@@ -8,26 +8,44 @@ dotenv.config();
 
 const app = express();
 
-// CORS Configuration
+// CORS Configuration - UPDATED & CORRECTED
 const allowedOrigins = [
-  'http://localhost:3000',   // React dev server
-  'http://localhost:5173',   // Vite dev server
+  // Development origins
+  'http://localhost:3000',
+  'http://localhost:5173',
   'http://localhost:5174',
   'http://127.0.0.1:3000',
   'http://127.0.0.1:5173',
   'http://127.0.0.1:5174',
-  'https://project-app-frontend.vercel.app' // 🔥 replace with your real Vercel domain
+  
+  // Production & Preview origins - NO TRAILING SLASH
+  'https://your-main-app.vercel.app', // 👈 REPLACE THIS WITH YOUR ACTUAL PRODUCTION URL
+  // The regex below will handle all preview deployments automatically
 ];
+
+// Create a regex pattern to match ANY vercel.app subdomain
+const vercelPreviewPattern = /https:\/\/project-.*-chukas-projects-b49de2bb\.vercel\.app/;
+// For even more flexibility, you can use this broader pattern:
+// const vercelPattern = /https:\/\/.*\.vercel\.app/;
 
 app.use(cors({
   origin: function (origin, callback) {
-    // Allow requests with no origin (like Postman)
+    // Allow requests with no origin (like Postman, mobile apps, etc.)
     if (!origin) return callback(null, true);
-    if (allowedOrigins.indexOf(origin) === -1) {
-      const msg = `🚫 This CORS policy does not allow access from origin: ${origin}`;
-      return callback(new Error(msg), false);
+    
+    // Check 1: Is it in the hardcoded allowed list?
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      return callback(null, true);
     }
-    return callback(null, true);
+    
+    // Check 2: Does it match the Vercel preview pattern?
+    if (vercelPreviewPattern.test(origin)) {
+      return callback(null, true);
+    }
+    
+    // If none of the above, reject the request
+    const msg = `🚫 CORS policy: Access from origin ${origin} is not allowed.`;
+    return callback(new Error(msg), false);
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
