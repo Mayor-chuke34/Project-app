@@ -4,8 +4,6 @@
 const BACKEND_API_URL = import.meta.env.VITE_BACKEND_API_URL || 'http://localhost:5000/api';
 const DUMMYJSON_API_URL = import.meta.env.VITE_DUMMYJSON_API_URL || 'https://dummyjson.com';
 
-import { getStoredToken } from './auth';
-
 // Helper function to get auth token and check expiration
 const getAuthToken = () => {
   try {
@@ -53,8 +51,8 @@ const backendRequest = async (endpoint, options = {}) => {
   const defaultOptions = {
     headers: {
       'Content-Type': 'application/json',
-  ...(token && { Authorization: `Bearer ${token}` }),
-  ...(token && { 'x-auth-token': token }),
+      ...(token && { Authorization: `Bearer ${token}` }),
+      ...(token && { 'x-auth-token': token }),
     },
   };
 
@@ -265,82 +263,6 @@ const productsAPI = {
       return { success: true, data: Array.from(allCategories) };
     } catch (error) {
       console.error('Error fetching categories:', error);
-      return { success: false, error: error.message };
-    }
-  },
-
-  // Get product by ID from either source
-  getById: async (id) => {
-    try {
-      if (id.startsWith('dummy_')) {
-        const dummyResponse = await dummyJsonRequest(`/products/${id.replace('dummy_', '')}`);
-        if (dummyResponse.success) {
-          const product = dummyResponse.data;
-          return {
-            success: true,
-            data: {
-              id: `dummy_${product.id}`,
-              name: product.title,
-              price: product.price,
-              description: product.description,
-              image: product.thumbnail,
-              category: product.category,
-              rating: product.rating,
-              brand: product.brand,
-              source: 'dummyjson'
-            }
-          };
-        }
-      } else if (id.startsWith('fakestore_')) {
-        const fakeStoreResponse = await fakeStoreRequest(`/products/${id.replace('fakestore_', '')}`);
-        if (fakeStoreResponse.success) {
-          const product = fakeStoreResponse.data;
-          return {
-            success: true,
-            data: {
-              id: `fakestore_${product.id}`,
-              name: product.title,
-              price: product.price,
-              description: product.description,
-              image: product.image,
-              category: product.category,
-              rating: { rate: product.rating.rate, count: product.rating.count },
-              source: 'fakestore'
-            }
-          };
-        }
-      }
-
-      return { success: false, error: 'Product not found' };
-    } catch (error) {
-      console.error('Error fetching product by ID:', error);
-      return { success: false, error: error.message };
-    }
-  },
-
-  // Search for products
-  search: async (query) => {
-    try {
-      const searchResponse = await dummyJsonRequest(`/products/search?q=${encodeURIComponent(query)}`);
-      if (!searchResponse.success) {
-        throw new Error('Search request failed');
-      }
-
-      const products = searchResponse.data.products.map(p => ({
-        id: `dummy_${p.id}`,
-        name: p.title,
-        price: p.price,
-        description: p.description,
-        image: p.thumbnail,
-        category: p.category,
-        rating: p.rating,
-        brand: p.brand,
-        source: 'dummyjson'
-      }));
-
-      return { success: true, data: { products } };
-    } catch (error) {
-      console.error('Error searching products:', error);
       return { success: false, error: error.message };
     }
   },
